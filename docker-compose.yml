@@ -1,0 +1,19 @@
+version: "3.4"
+
+services:
+  minio_api:
+    container_name: minio_api
+    hostname: minio_api
+    build: 
+      context: ./minio_api
+      dockerfile: Dockerfile_dev
+    volumes: 
+      - ./minio_api/app:/app
+    ports: 
+      - 9010:9010
+    stdin_open: true
+
+networks: 
+  default:
+    external:
+      name: the_network
