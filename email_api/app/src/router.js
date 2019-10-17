@@ -6,7 +6,7 @@ const cors = require("cors"),
   http = require("http"),
   // https = require("https"),
   bodyParser = require("body-parser"),
-  minioHelper = require("./minioHelper");
+  emailHelper = require("./emailHelper");
 
 
 app.use(bodyParser.json());
@@ -24,7 +24,7 @@ app.get("/yolo", (req, res) => {
 app.put("/createBucket", (req, res) => {
   console.log("Start of Create bucket");
 
-  minioHelper.createBucket(req.body.bucketName)
+  emailHelper.createBucket(req.body.bucketName)
     .then(result => {console.log(result);
     res.send(result).end()})
     .catch(err => {console.log(err);
@@ -35,7 +35,7 @@ app.put("/createBucket", (req, res) => {
 app.put("/createObject", (req, res) => {
   console.log("Start of Create object");
   
-  minioHelper.createObject(req.body)
+  emailHelper.createObject(req.body)
     .then(result => res.send(result).end())
     .catch(err => res.send(err).end());
   
@@ -43,7 +43,7 @@ app.put("/createObject", (req, res) => {
 
 app.get("/listConf", (req, res) => {
   console.log("Got request on " + req.path);
-  minioHelper.getListConf(req.body.bucketName)
+  emailHelper.getListConf(req.body.bucketName)
     .then(result => {
       console.log("get went well", result);
       res.send(result).end();
@@ -55,21 +55,21 @@ app.get("/listConf", (req, res) => {
 });
 
 app.delete("/removeBucket", (req, res) => {
-  minioHelper.removeBucket(req.body.bucketName)
+  emailHelper.removeBucket(req.body.bucketName)
     .then(result => res.send(result).end())
     .catch(err => res.send(err).end());
   
 });
 
 app.delete("/removeObject", (req, res) => {
-  minioHelper.removeObject(req.body)
+  emailHelper.removeObject(req.body)
     .then(result => res.send(result).end())
     .catch(err => res.send(err).end());
   
 });
 
 app.delete("/removeAllObjects", (req, res) => {
-  minioHelper.removeAllObjects(req.body.bucketName)
+  emailHelper.removeAllObjects(req.body.bucketName)
     .then(result => res.send(result).end())
     .catch(err => res.send(err).end());
   
