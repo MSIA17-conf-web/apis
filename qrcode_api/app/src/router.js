@@ -10,18 +10,15 @@ const cors = require("cors"),
   qr = require('qr-image'),
   fs = require('fs');
 
-
-const apiName = "/qrcode_api";
-
 app.use(bodyParser.json());
 app.use(cors());
 
 app.get("/*", (req, res, next) => {
   console.log("Request", req.headers);
   next();
-});
+});
 
-app.put(apiName + "/createQRCode", (req, res) => {
+app.put("/createQRCode", (req, res) => {
   let body = req.body, qrCodeText, nom = body.nom,
     prenom = body.prenom, enterpriseName = body.enterpriseName,
     reservationList = body.reservationList;
@@ -65,8 +62,3 @@ app.put(apiName + "/createQRCode", (req, res) => {
 app.listen(process.env.SERVER_PORT, () => {
   console.log("Launched on port " + process.env.SERVER_PORT);
 });
-
-function createQRCodeText(nom, prenom, enterpriseName) {
-  return nom + ' ' + prenom + '\n'
-  enterpriseName;
-}
