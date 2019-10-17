@@ -9,6 +9,7 @@ services:
       dockerfile: Dockerfile_dev
     volumes: 
       - ./common_api/app:/app
+      - cert-handler_certbot-letsencrypt:/etc/letsencrypt
     ports:
       - 9010:9010
     networks:
@@ -57,12 +58,13 @@ services:
   # networks:
   #   - network_api
   # stdin_open: true
-
+volumes: 
+  cert-handler_certbot-letsencrypt:
+    external: true
 
 networks: 
   the_network:
     external: true
-  
   network_api:
     external: true
   
