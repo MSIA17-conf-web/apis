@@ -4,48 +4,44 @@ require("dotenv").config();
 const axios = require("axios"),
   cors = require("cors"),
   express = require("express"),
+  https = require('https'),
+  fs = require('fs'),
   app = express(),
   // http = require("http"),
   // https = require("https"),
   bodyParser = require("body-parser");
+  
+const options = {
+    key: fs.readFileSync("/etc/letsencrypt/live/www.msia17conferences.com/privkey.pem"),
+    cert: fs.readFileSync("/etc/letsencrypt/live/www.msia17conferences.com/fullchain.pem"),
+    ca: fs.readFileSync("/etc/letsencrypt/live/www.msia17conferences.com/chain.pem")
+  };
 
+const httpsServer = https.createServer(options, app)
 
 app.use(bodyParser.json());
 app.use(cors());
 
-// if common api mettre en commentaire
-// app.all("*", (req, res, next) => {
-//   console.log("Got request on : " + req.path);
-//   next();
-// });
-
-app.all("/api/*", (req, res) => {
+app.all("/api", (req, res) => {
   try {
     console.log("Request", req.headers);
     console.log("");
 
     checkBody("api", req.body)
       .then(checkedBody => {
-        console.log("yoooolo");
-
-        // Get specific api url
-        let regexApi = new RegExp("\/.*");
-        let apiUrl = checkedBody.url.match(regexApi)[0].substring(1);
-
-        console.log("checkedBody.url", apiUrl);
 
         axios
           .request({
             method: checkedBody.method,
-            url: apiUrl,
-            baseUrl: checkedBody.baseUrl,
-            data: checkedBody.data
+            url: checkedBody.url,
+            baseURL: checkedBody.baseURL,
+            data: checkedBody.body
           })
           .then(response => {
-            console.log("response from ", checkedBody.baseUrl);
-            console.log(response.data.result);
+            console.log("response from ", checkedBody.baseURL);
+            console.log(response.data);
 
-            res.send(response.data.result).end();
+            res.send(response.data).end();
           })
           .catch(err => {
             console.log("Error during api request ", err);
@@ -64,7 +60,7 @@ app.all("/api/*", (req, res) => {
   }
 });
 
-app.listen(process.env.SERVER_PORT, () => {
+httpsServer.listen(process.env.SERVER_PORT, () => {
   console.log("Launched on port " + process.env.SERVER_PORT);
 });
 
@@ -80,7 +76,7 @@ function checkBody(method, body) {
         if (!("method" in body)) missing_opt.push("method is missing from body")
         if (!("url" in body)) missing_opt.push("url is missing from body")
         if (!("baseURL" in body)) missing_opt.push("baseURL is missing from body")
-        if (!("data" in body)) missing_opt.push("data is missing from body")
+        if (!("body" in body)) missing_opt.push("body is missing from body")
 
         if (missing_opt.length != 0) {
           reject({ error: missing_opt })
@@ -95,7 +91,7 @@ function checkBody(method, body) {
           if (typeof body.baseURL !== "string")
             type_error.push("baseURL must be a string");
           if (typeof body.body !== "object")
-            type_error.push("data must be an object");
+            type_error.push("body must be an object");
 
           if (type_error.length != 0) {
             reject({ error: type_error })
@@ -112,10 +108,10 @@ function checkBody(method, body) {
             } else {
               console.log("body check for + " + method + " OK ");
 
-              resolve(bobodydy)
-            }body
-          }body
-        }body
+              resolve(body)
+            }
+          }
+        }
         break;
 
       default:
