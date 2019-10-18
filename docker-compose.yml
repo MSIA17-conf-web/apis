@@ -44,6 +44,20 @@ services:
     networks:
       - network_api
     stdin_open: true
+    
+  mongo_api:
+    container_name: mongo_api
+    hostname: mongo_api
+    build: 
+      context: ./mongo_api
+      dockerfile: Dockerfile_dev
+    volumes: 
+      - ./mongo_api/app:/app
+    ports: 
+      - 9010
+    networks:
+      - the_network
+    stdin_open: true
 
 volumes: 
   cert-handler_certbot-letsencrypt:
