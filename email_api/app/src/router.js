@@ -6,10 +6,8 @@ const cors = require("cors"),
   http = require("http"),
   // https = require("https"),
   bodyParser = require("body-parser"),
-  qr = require('qr-image'),
-  fs = require('fs'),
+  qrcodeHelper = require("./qrcodeHelper"),
   emailHelper = require("./emailHelper");
-
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -19,52 +17,16 @@ app.get("/*", (req, res, next) => {
   next();
 });
 
+app.post("/sendEmail", (req, res) => {
+  emailHelper.sendEmail(req.body)
+    .then(result => res.send(result).end())
+    .catch(err => res.send(err).end());
+});
+
 app.put("/createQRCode", (req, res) => {
-  let body = req.body, qrCodeText, lastName = body.lastName,
-    firstName = body.firstName, enterpriseName = body.enterpriseName,
-    reservationsList = body.reservationsList;
-
-  if (lastName && firstName && enterpriseName) {
-    // Get the text to generate QR code
-    qrCodeText = "Nom : " + lastName
-     + "\nPrénom : " + firstName 
-     + "\nEntreprise : " + enterpriseName;
-
-    if (reservationsList && reservationsList.length != 0) {
-      if (reservationsList.length == 1) {
-        qrCodeText += '\n\nRéservation :';
-      } else {
-        qrCodeText += '\n\nRéservations :';
-      }
-
-      reservationsList.forEach(reservation => {
-        qrCodeText += '\n- ' + reservation;
-      })
-
-      // Generate QR Code from text
-      let qrCodePng = qr.imageSync(qrCodeText, { type: 'png' })
-
-      console.log("qrCodePng", qrCodePng);
-
-
-      // Generate a random file name 
-      // let qr_code_file_name = new Date().getTime() + '.png';
-
-      // fs.writeFileSync('../QRCodeTest/' + qr_code_file_name, qrCodePng, err => {
-
-      //   if (err) {
-      //     res.send(err).end();
-      //   }
-
-      // });
-
-
-
-      console.log("return statement writeFileSync", qrCodePng.toString('base64'));
-      res.send(qrCodePng.toString('base64')).end()
-
-    }
-  }
+  qrcodeHelper.createQRCode(req.body)
+    .then(result => res.send(result).end())
+    .catch(err => res.send(err).end());
 });
 
 app.listen(process.env.SERVER_PORT, () => {
