@@ -52,7 +52,7 @@ app.get("/listConfBuckets", (req, res) => {
     });
 });
 
-app.get("/listConfFiles", (req, res) => {
+app.post("/listConfFiles", (req, res) => {
   console.log("Got request on{ fileName: fileName } " + req.path);
   minioHelper.getListConfFiles(req.body.bucketName)
     .then(result => {
@@ -63,7 +63,7 @@ app.get("/listConfFiles", (req, res) => {
     });
 });
 
-app.get("/getFile", (req, res) => {
+app.post("/getFile", (req, res) => {
   minioHelper.getFile(req.body)
     .then(result => res.send(result).end())
     .catch(err => res.send(err).end());
@@ -99,5 +99,5 @@ app.delete("/removeAllFiles", (req, res) => {
 });
 
 app.listen(process.env.SERVER_PORT, () => {
-  console.log("Launched on port " + process.env.SERVER_PORT);
+  console.log("Minio API launched on port " + process.env.SERVER_PORT);
 });

@@ -61,7 +61,7 @@ app.all("/api", (req, res) => {
 });
 
 httpsServer.listen(process.env.SERVER_PORT, () => {
-  console.log("Launched on port " + process.env.SERVER_PORT);
+  console.log("Common API launched on port " + process.env.SERVER_PORT);
 });
 
 function checkBody(method, body) {

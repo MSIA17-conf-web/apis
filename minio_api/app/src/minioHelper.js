@@ -49,15 +49,11 @@ let minioHelper = {
         });
     },
     getFile: body => {
-        console.log("yooooooolo");
-
         return new Promise((resolve, reject) => {
-            var size = 0;
+            let buffer = "";
 
             let error = checkBody(body, false, true, true);
             let bucketName = body.bucketName, fileName = body.fileName;
-            console.log("body.bucketName, body.fileName", bucketName, fileName);
-            console.log("error", error, error.length);
 
             if (error.length != 0) {
                 console.log("erronnnnnnnnr", error, error.length);
@@ -73,19 +69,14 @@ let minioHelper = {
                     console.log("err 1", err)
                     reject({ err: err })
                 }
-                dataStream.on('data', function (chunk) {
-                    console.log("chunk", chunk);
 
-                    size += chunk.length;
+                dataStream.on('data', function (chunk) {
+                    buffer += chunk.toString("base64");
                 })
                 dataStream.on('end', function () {
-                    console.log('End. Total size = ' + size)
-                    console.log("dataStream", dataStream);
-                    
-                    resolve({ result: { file: "ok" } });
+                    resolve({ result: { fileStream: buffer } });
                 })
                 dataStream.on('error', function (err) {
-                    console.log("err 2", err)
                     reject({ err: err });
                 })
             });
@@ -93,15 +84,18 @@ let minioHelper = {
     },
     createFile: body => {
         return new Promise((resolve, reject) => {
-            let bucketName = body.bucketName,
-                fileName = body.fileName;
-            // filePath = body.filePath;
-
             let error = checkBody(body, false, true, true, true, true);
 
             if (error.length != 0) {
                 reject({ err: error });
             }
+
+            let bucketName = body.bucketName,
+            fileName = body.fileName,
+            fileStream = body.fileStream,
+            fileSize = body.fileSize;
+            // filePath = body.filePath;
+            
 
             console.log("Création du fichier " + fileName + " dans le bucket " + bucketName);
 
@@ -123,9 +117,16 @@ let minioHelper = {
 
                                 // Check if the file exist
                                 if (!filesList.includes(fileName)) {
+                                    console.log("file not exist ;)",bucketName, fileName, fileStream, fileSize);
+                                    
                                     // Using fPutObject API upload your file to the bucket.
-                                    minioClient.putObject(bucketName, fileName, fileStream, fileSize, function (err, etag) {
+                                    
+                                    minioClient.putObject(bucketName, fileName, new Buffer(fileStream.replace(/^data:.+;base64,/, ""),'base64'), fileSize, function (err, etag) {
+                                        // minioClient.putObject(bucketName, fileName, fileStream, fileSize, function (err, etag) {
                                         // minioClient.putObject(bucketName, fileName, streamifier.createReadStream(fileStream), fileSize, function (err, etag) {
+                                        console.log("in putObject");
+                                        
+                                        
                                         if (err) {
                                             reject({ err: { err: true } });
                                         }
@@ -135,6 +136,8 @@ let minioHelper = {
                                     });
 
                                 } else {
+                                    console.log("file exist :(");
+                                    
                                     reject({ err: { errFileExist: true } })
                                 }
                             })
