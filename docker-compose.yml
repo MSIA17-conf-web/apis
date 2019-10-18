@@ -31,33 +31,20 @@ services:
       - network_api
     stdin_open: true
     
-  qrcode_api:
-    container_name: qrcode_api
-    hostname: qrcode_api
+  email_api:
+    container_name: email_api
+    hostname: email_api
     build: 
-      context: ./qrcode_api
+      context: ./email_api
       dockerfile: Dockerfile_dev
     volumes: 
-      - ./qrcode_api/app:/app
+      - ./email_api/app:/app
     ports: 
       - 9010
     networks:
       - network_api
     stdin_open: true
 
-  # email_api:
-  # container_name: email_api
-  # hostname: email_api
-  # build: 
-  #   context: ./email_api
-  #   dockerfile: Dockerfile_dev
-  # volumes: 
-  #   - ./email_api/app:/app
-  # ports: 
-  #   - 9010
-  # networks:
-  #   - network_api
-  # stdin_open: true
 volumes: 
   cert-handler_certbot-letsencrypt:
     external: true
