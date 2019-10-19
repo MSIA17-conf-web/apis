@@ -1,72 +1,91 @@
 require("dotenv").config();
 
 let nodemailer = require('nodemailer'),
-    qrcodeHelper = require("./qrcodeHelper");
+    qrCodeHelper = require("./qrCodeHelper"),
+    transporter = null;
 
 let emailHelper = {
+    initTransporter: () => {
+        transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_ADDRESS,
+                pass: process.env.EMAIL_PASSWORD
+            }
+        });
+    },
     sendEmail: body => {
         return new Promise((resolve, reject) => {
-            console.log("process.env.EMAIL_ADDRESS", process.env.EMAIL_ADDRESS);
-            console.log("process.env.EMAIL_PASSWORD", process.env.EMAIL_PASSWORD);
+            let email = body.email;
 
+            console.log("Ecriture du mail");
+            let mailOptions = emailHelper.emailTemplate(body);
+            console.log("Ecriture du mail terminé");
 
-
-            let transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.EMAIL_ADDRESS,
-                    pass: process.env.EMAIL_PASSWORD
+            transporter.sendMail(mailOptions, function (err, info) {
+                if (err) {
+                    console.log("Error sending mail to", email, err);
+                    reject({ err: err });
+                } else {
+                    console.log('Email sent to ' + email);
+                    resolve({ result: 'Email sent to ' + email });
                 }
             });
+        });
+    },
+    sendManyEmail: data => {
+        return new Promise((resolve, reject) => {
+            let error = [];
 
-            let mailOptions = emailHelper.emailTemplate(body)
-                .then(result => {
+            data.forEach(user => {
+                new Promise((resolve, reject) => {
+                    let userInformations = {
+                        lastName: user.lastName,
+                        firstName: user.firstName,
+                        enterpriseName: user.enterpriseName,
+                        email: user.email
+                    }
+                    console.log("rrrrrrrrrrrrrrrrrr", userInformations);
+
+                    let mailOptions = emailHelper.emailTemplate(user);
+
                     transporter.sendMail(mailOptions, function (err, info) {
                         if (err) {
-                            console.log("err: ", err);
-
-                            reject({ err: err });
+                            console.log("Error sending mail to", userInformations.email, err);
+                            reject({
+                                err: err,
+                                userInformations: userInformations
+                            });
                         } else {
-                            console.log('Email sent from ' + body.userEmail);
-
-                            resolve({ result: 'Email sent from ' + body.userEmail });
+                            resolve({ result: userInformations.email });
                         }
                     });
-                })
-                .catch(err => reject({ err: err }));
+                }).then(result => {
+                    console.log("Email sent to", result.result);
+                }).catch(err => {
+                    console.log("yoloooooooooooooooooo");
+                    error.push(err);
+                });
+            });
         });
     },
     emailTemplate: body => {
-        return new Promise((resolve, reject) => {
-            let mailOptions = {
-                from: process.env.EMAIL_ADDRESS,
-                to: body.userEmail,
-                subject: 'Sending Email using Node.js'
-            };
+        console.log("emailTemplate");
+        let qrCode = qrCodeHelper.createQRCode(body);
 
-            // call qrcode, if error mettre text avec les infos, sinon mettre buffer dans img
-            qrcodeHelper.createQRCode(req.body)
-                .then(result => {
-                    mailOptions.attachments = [{
-                        filename: 'test1.png',
-                        content: atob(result.result)
-                    },
-                    {   // encoded string as an attachment
-                        filename: 'test2.png',
-                        content: result.result,
-                        encoding: 'base64'
-                    },
-                    {   // data uri as an attachment
-                        path: 'data:image/png;' + result.result
-                    }];
-                })
-                .catch(err => {
-                    console.log("Error with createQRCode function", err);
-                    reject(err);
-                });
-
-            ;
-        });
+        return {
+            from: process.env.EMAIL_ADDRESS,
+            to: body.email,
+            subject: "Sending Email using Node.js",
+            html: "<h3>Bonjour " + body.lastName + " " + body.firstName + "</h3>"
+                + "<p>Merci d'avoir réservé sur notre site.</p>"
+                + "<p>Veuillez trouver en pièce jointe un QRCode permettant de vous identifiez le jour J. Gardé le précieusement.</p>",
+            attachments: [{   // encoded string as an attachment
+                filename: "QRCode-" + body.lastName + "-" + body.firstName + ".png",
+                content: qrCode.result,
+                encoding: "base64"
+            }]
+        };
     }
 }
 
