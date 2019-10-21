@@ -59,6 +59,20 @@ services:
       - the_network
     stdin_open: true
 
+  mqtt_api:
+    container_name: mqtt_api
+    hostname: mqtt_api
+    build: 
+      context: ./mqtt_api
+      dockerfile: Dockerfile_dev
+    volumes: 
+      - ./mqtt_api/app:/app
+    ports: 
+      - 9010
+    networks:
+      - the_network
+    stdin_open: true
+
 volumes: 
   cert-handler_certbot-letsencrypt:
     external: true
@@ -68,7 +82,4 @@ networks:
     external: true
   network_api:
     external: true
-  
-
-
       # voir pour metttre un nouveau nom de reseau et c'est sur ce nouveau réseau que les api taperont
