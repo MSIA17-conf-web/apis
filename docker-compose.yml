@@ -4,9 +4,10 @@ services:
   common_api:
     container_name: common_api
     hostname: common_api
+    restart: always
     build: 
       context: ./common_api
-      dockerfile: Dockerfile_dev
+      dockerfile: Dockerfile
     volumes: 
       - ./common_api/app:/app
       - cert-handler_certbot-letsencrypt:/etc/letsencrypt
@@ -15,7 +16,22 @@ services:
     networks:
       - the_network
       - network_api
-    stdin_open: true
+
+  # common_api:
+  #   container_name: common_api
+  #   hostname: common_api
+  #   build: 
+  #     context: ./common_api
+  #     dockerfile: Dockerfile_dev
+  #   volumes: 
+  #     - ./common_api/app:/app
+  #     - cert-handler_certbot-letsencrypt:/etc/letsencrypt
+  #   ports:
+  #     - 9010:9010
+  #   networks:
+  #     - the_network
+  #     - network_api
+  #   stdin_open: true
 
   minio_api:
     container_name: minio_api
