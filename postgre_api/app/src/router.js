@@ -6,14 +6,6 @@ const cors = require("cors"),
   http = require("http"),
   // https = require("https"),
   bodyParser = require("body-parser"),
-  Pool = require('pg').Pool,
-  pool = new Pool({
-    user: 'admin',
-    host: 'postgre',
-    database: 'conferences',
-    password: 'admin',
-    port: 5432,
-  }),
   postgreHelper = require("./postgreHelper");
 
 app.use(bodyParser.json());
@@ -32,50 +24,106 @@ app.get("/*", (req, res, next) => {
 });
 
 app.get("/test", (req, res) => {
+  let result = postgreHelper.getTest()
+  console.log("/test", result);
 
   res.send("ok").end();
 });
 
-app.put("/selectAll", (req, res) => {
-  pool.query('SELECT * FROM users ORDER BY id ASC', (err, results) => {
-    if (err) {
-      res.send({err: err})
-    }
-    console.log("results", results);
-    
-    res.status(200).json(results.rows).end();
+app.get("/getAllGuest", (req, res) => {
+  let body = req.body;
+
+  let error = checkBody(body.table, body.orderBy)
+
+  if (error.length != 0) {
+    console.log("Error calling getAllGuest", error);
+    res.send(error).end();
+  } else {
+    postgreHelper.getAll(body)
+      .then(result => res.send(result).end())
+      .catch(err => res.send(err).end());
+  }
+});
+
+app.post("/createGuest", (req, res) => {
+  let body = req.body;
+
+  let error = checkBody(body.table, false, body.lastName, body.firstName, body.enterpriseName, body.email);
+
+  if (error.length != 0) {
+    console.log("Error calling createGuest", error);
+    res.send(error).end();
+  } else {
+    postgreHelper.createGuest(body)
+      .then(result => res.send(result).end())
+      .catch(err => res.send(err).end());
+  }
+});
+
+app.put("/updateGuest", (req, res) => {
+  let body = req.body;
+
+  let error = checkBody(body.table, false, body.lastName, body.firstName, body.enterpriseName, body.email, body.id);
+
+  if (error.length != 0) {
+    console.log("Error calling createGuest", error);
+    res.send(error).end();
+  } else {
+    postgreHelper.updateGuest(body)
+      .then(result => res.send(result).end())
+      .catch(err => res.send(err).end());
+  }
+});
+
+app.delete("/removeGuest", (req, res) => {
+  let body = req.body;
+
+  postgreHelper.removeGuest(body)
+    .then(result => res.send(result).end())
+    .catch(err => res.send(err).end());
+});
+
+postgreHelper.initConnection().then(ok => {
+  console.log(ok);
+  app.listen(process.env.SERVER_PORT, () => {
+    console.log("Postgre API launched on port " + process.env.SERVER_PORT);
   });
+}).catch(err => {
+  console.log('Error connecting to DB', err);
 });
 
-app.put("/createFile", (req, res) => {
+function checkBody(table, orderBy, lastName, firstName, enterpriseName, email, id) {
+  let error = [];
 
+  if (!table || !orderBy || !lastName || !firstName || !enterpriseName || !email || id) {
+    if (!table) {
+      error.push({ errTable: true });
+    }
 
-});
+    if (!orderBy) {
+      error.push({ errOrderBy: true });
+    }
 
-app.get("/listConfBuckets", (req, res) => {
+    if (!lastName) {
+      error.push({ errLastName: true });
+    }
 
-});
+    if (!firstName) {
+      error.push({ errFirstName: true });
+    }
 
-app.post("/listConfFiles", (req, res) => {
+    if (!enterpriseName) {
+      error.push({ errEnterpriseName: true });
+    }
 
-});
+    if (!email) {
+      error.push({ errEmail: true });
+    }
 
-app.post("/getFile", (req, res) => {
+    if (!id) {
+      error.push({ errId: true });
+    }
+  }
 
-});
-
-app.delete("/removeBucket", (req, res) => {
-
-});
-
-app.delete("/removeFile", (req, res) => {
-
-});
-
-app.delete("/removeAllFiles", (req, res) => {
-
-});
-
-app.listen(process.env.SERVER_PORT, () => {
-  console.log("Postgre API launched on port " + process.env.SERVER_PORT);
-});
+  return error;
+}
