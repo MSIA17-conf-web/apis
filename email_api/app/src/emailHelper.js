@@ -1,8 +1,9 @@
 require("dotenv").config();
 
-let nodemailer = require('nodemailer'),
-    qrCodeHelper = require("./qrCodeHelper"),
-    transporter = null;
+const nodemailer = require('nodemailer'),
+    qrCodeHelper = require("./qrCodeHelper");
+
+let transporter = null;
 
 let emailHelper = {
     initTransporter: () => {
@@ -16,7 +17,7 @@ let emailHelper = {
     },
     sendEmail: body => {
         return new Promise((resolve, reject) => {
-            let email = body.email;
+            let email = body.userEmail;
 
             console.log("Ecriture du mail");
             let mailOptions = emailHelper.emailTemplate(body);
@@ -33,40 +34,30 @@ let emailHelper = {
             });
         });
     },
-    sendManyEmail: data => {
+    sendManyEmail: body => {
         return new Promise((resolve, reject) => {
             let error = [];
 
-            data.forEach(user => {
-                new Promise((resolve, reject) => {
-                    let userInformations = {
-                        lastName: user.lastName,
-                        firstName: user.firstName,
-                        enterpriseName: user.enterpriseName,
-                        email: user.email
-                    }
-                    console.log("rrrrrrrrrrrrrrrrrr", userInformations);
+            var allEmail = body.userList.map((mailBody) => {
+                return new Promise((resolve, reject) => {
+                    emailHelper.sendEmail(mailBody)
+                        .then(() => {
+                            resolve({ result: 'Email sent to ' + mailBody.userEmail })
+                        })
+                        .catch(err => {
+                            reject({ err: err })
+                        })
+                })
+            })
 
-                    let mailOptions = emailHelper.emailTemplate(user);
+            Promise.all(allEmail).then(results => {
+                console.log("Result of many email sent : ", results);
+                resolve(results)
+            }).catch(err => {
+                console.log("Error of many email sent : ", err);
+                reject(err)
 
-                    transporter.sendMail(mailOptions, function (err, info) {
-                        if (err) {
-                            console.log("Error sending mail to", userInformations.email, err);
-                            reject({
-                                err: err,
-                                userInformations: userInformations
-                            });
-                        } else {
-                            resolve({ result: userInformations.email });
-                        }
-                    });
-                }).then(result => {
-                    console.log("Email sent to", result.result);
-                }).catch(err => {
-                    console.log("yoloooooooooooooooooo");
-                    error.push(err);
-                });
-            });
+            })
         });
     },
     emailTemplate: body => {
@@ -75,11 +66,13 @@ let emailHelper = {
 
         return {
             from: process.env.EMAIL_ADDRESS,
-            to: body.email,
+            to: body.userEmail,
             subject: "Sending Email using Node.js",
             html: "<h3>Bonjour " + body.lastName + " " + body.firstName + "</h3>"
                 + "<p>Merci d'avoir réservé sur notre site.</p>"
-                + "<p>Veuillez trouver en pièce jointe un QRCode permettant de vous identifiez le jour J. Gardé le précieusement.</p>",
+                + "<p>Veuillez trouver en pièce jointe un QRCode permettant de vous identifiez le jour J. Gardé le précieusement.</p>"
+                + "<img src='data:image/png;base64," + qrCode.result + "'>",
+
             attachments: [{   // encoded string as an attachment
                 filename: "QRCode-" + body.lastName + "-" + body.firstName + ".png",
                 content: qrCode.result,
