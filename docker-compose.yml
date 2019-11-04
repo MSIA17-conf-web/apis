@@ -15,7 +15,7 @@ services:
       - 9010:9010
     networks:
       - the_network
-      - network_api
+      - the_network
 
   # common_api:
   #   container_name: common_api
@@ -30,7 +30,7 @@ services:
   #     - 9010:9010
   #   networks:
   #     - the_network
-  #     - network_api
+  #     - the_network
   #   stdin_open: true
 
   minio_api:
@@ -44,7 +44,7 @@ services:
     ports: 
       - 9010
     networks:
-      - network_api
+      - the_network
     stdin_open: true
     
   email_api:
@@ -58,7 +58,7 @@ services:
     ports: 
       - 9010
     networks:
-      - network_api
+      - the_network
     stdin_open: true
     
   mongo_api:
@@ -100,7 +100,7 @@ services:
     ports: 
       - 9010
     networks:
-      - network_api
+      - the_network
     stdin_open: true
 
 volumes: 
@@ -109,7 +109,5 @@ volumes:
 
 networks: 
   the_network:
-    external: true
-  network_api:
     external: true
       # voir pour metttre un nouveau nom de reseau et c'est sur ce nouveau réseau que les api taperont
