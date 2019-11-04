@@ -34,6 +34,25 @@ let emailHelper = {
             });
         });
     },
+    sendContactEmail: body => {
+        return new Promise((resolve, reject) => {
+            let email = body.userEmail;
+
+            console.log("Ecriture du mail");
+            let mailOptions = emailHelper.contactEmailTemplate(body);
+            console.log("Ecriture du mail terminé");
+
+            transporter.sendMail(mailOptions, function (err, info) {
+                if (err) {
+                    console.log("Error sending mail to", email, err);
+                    reject({ err: err });
+                } else {
+                    console.log('Email sent to ' + email);
+                    resolve({ result: 'Email sent to ' + email });
+                }
+            });
+        });
+    },
     sendManyEmail: body => {
         return new Promise((resolve, reject) => {
             let error = [];
@@ -78,6 +97,19 @@ let emailHelper = {
                 content: qrCode.result,
                 encoding: "base64"
             }]
+        };
+    },
+    contactEmailTemplate: body => {
+        console.log("contactEmailTemplate");
+
+        const lastName = body.lastName, firstName = body.firstName
+
+        return {
+            from: body.userEmail,
+            to: process.env.EMAIL_ADDRESS,
+            subject: lastName + " " + firstName + " cherche à nous contacter",
+            html: "<h3>Message :</h3>"
+                + "<p>" + body.messageEmail + "</p>"
         };
     }
 }

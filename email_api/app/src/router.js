@@ -20,7 +20,8 @@ app.get("/*", (req, res, next) => {
 app.post("/sendEmail", (req, res) => {
   let body = req.body;
 
-  let error = checkBody(body)
+  let error = checkBody(body);
+  checkBodyArray(error, body.reservationsList);
 
   if (!body.userEmail) {
     error.push({ errEmail: true });
@@ -37,29 +38,57 @@ app.post("/sendEmail", (req, res) => {
 });
 
 app.post("/sendManyEmail", (req, res) => {
-  if(!Array.isArray(req.body.userList) || !req.body.userList) {
-    res.send({err: "userList doesn't exist or is not an array"}).end();
+  if (!Array.isArray(req.body.userList) || !req.body.userList) {
+    res.send({ err: "userList doesn't exist or is not an array" }).end();
   } else {
     let errors = []
     req.body.userList.forEach(body => {
-      let error = checkBody(body) 
+      let error = checkBody(body);
+      checkBodyArray(error, body.reservationsList);
+      if (!body.userEmail) {
+        error.push({ errEmail: true });
+      }
       error.length != 0 ? errors.push(error) : null;
-      
+
     });
-    
-    if(errors.length == 0) {
+
+    if (errors.length == 0) {
       emailHelper.sendManyEmail(req.body)
         .then(result => res.send(result).end())
         .catch(err => res.send(err).end());
     } else {
       res.send(errors).end();
-    }    
+    }
+  }
+});
+
+
+app.post("/sendContactEmail", (req, res) => {
+  let body = req.body;
+
+  let error = checkBody(body);
+  if (!body.userEmail) {
+    error.push({ errEmail: true });
+  }
+
+  if(!body.messageEmail){
+    error.push({ errMessageEmail: true });
+  }
+
+  if (error.length != 0) {
+    console.log("Error calling sendEmail", error);
+    res.send(error).end();
+  } else {
+    emailHelper.sendContactEmail(req.body)
+      .then(result => res.send(result).end())
+      .catch(err => res.send(err).end());
   }
 });
 
 app.put("/createQRCode", (req, res) => {
   let body = req.body;
-  let error = checkBody(body)
+  let error = checkBody(body);
+  checkBodyArray(error, body.reservationsList);
 
   if (error.length != 0) {
     console.log("Error calling createQRCode", error);
@@ -79,8 +108,8 @@ app.listen(process.env.SERVER_PORT, () => {
 function checkBody(body) {
   let error = [];
 
-  if (!body.lastName || !body.firstName || !body.enterpriseName || !body.reservationsList || body.reservationsList.length == 0) {
-    error.push({for: body})
+  if (!body.lastName || !body.firstName || !body.enterpriseName) {
+    error.push({ for: body })
     if (!body.lastName) {
       error.push({ errLastName: true });
     }
@@ -99,4 +128,10 @@ function checkBody(body) {
   }
 
   return error;
+}
+
+function checkBodyArray(error, reservationsList) {
+  if (!reservationsList || reservationsList.length == 0) {
+    error.push({ errReservationsListNotEmpty: true });
+  }
 }
