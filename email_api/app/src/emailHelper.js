@@ -47,16 +47,14 @@ let emailHelper = {
                     console.log("Error sending mail to", email, err);
                     reject({ err: err });
                 } else {
-                    console.log('Email sent to ' + email);
-                    resolve({ result: 'Email sent to ' + email });
+                    console.log('Email sent by ' + email);
+                    resolve({ result: true });
                 }
             });
         });
     },
     sendManyEmail: body => {
         return new Promise((resolve, reject) => {
-            let error = [];
-
             var allEmail = body.userList.map((mailBody) => {
                 return new Promise((resolve, reject) => {
                     emailHelper.sendEmail(mailBody)
@@ -80,7 +78,6 @@ let emailHelper = {
         });
     },
     emailTemplate: body => {
-        console.log("emailTemplate");
         let qrCode = qrCodeHelper.createQRCode(body);
 
         return {
@@ -100,14 +97,10 @@ let emailHelper = {
         };
     },
     contactEmailTemplate: body => {
-        console.log("contactEmailTemplate");
-
-        const lastName = body.lastName, firstName = body.firstName
-
         return {
             from: body.userEmail,
             to: process.env.EMAIL_ADDRESS,
-            subject: lastName + " " + firstName + " cherche à nous contacter",
+            subject: body.lastName + " " + body.firstName + " cherche à nous contacter",
             html: "<h3>Message :</h3>"
                 + "<p>" + body.messageEmail + "</p>"
         };
