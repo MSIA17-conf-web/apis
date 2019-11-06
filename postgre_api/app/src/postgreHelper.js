@@ -18,6 +18,10 @@ const cn = {
     port: process.env.port
 };
 
+var sqlQueries = {
+    confFormData: loadQueryFromFile("confFormData")
+}
+
 var db = pgp(cn);
 
 module.exports = {
@@ -35,11 +39,10 @@ module.exports = {
     },
     execFromFile: (body) => {
         return new Promise((resolve, reject) => {
-            db.any(loadQueryFromFile(body.fileName), body.options)
+            db.any(sqlQueries[body.fileName], body.options)
                 .then(res => {
                     console.log("Got result for",body.fileName);
                     console.log(res);
-                    
                     resolve(res);
                 })
                 .catch(err => {

@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const cors = require("cors"),
     express = require("express"),
+    { check, validationResult } = require('express-validator'),
     app = express(),
     bodyParser = require("body-parser"),
     postgreHelper = require("./postgreHelper");
@@ -14,24 +15,23 @@ app.all("/*", (req, res, next) => {
     next();
 });
 
-app.post("/from-file", (req, res) => {
-    checkBody("from-file", req.body, err => {
-        if (err.length != 0) {
-            console.log(err);
-            res.send({ err: err }).end()
-        } else {
-            postgreHelper.execFromFile(req.body)
-                .then(data => {                  
-                    
-                    res.send({ res: data.map((tmp => { return tmp.json})) }).end();
-                })
-                .catch(err => {
-                    console.log('prout', err);
-                    
-                    res.send({ err: err }).end()
-                })
-        }
-    })
+app.post("/from-file", [
+    check('fileName').isString().not().isEmpty(),
+    check('options').not().isEmpty()
+], (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.send({ errors: errors.array() }).end();
+    } else {
+        postgreHelper.execFromFile(req.body)
+            .then(data => {
+                res.send(data.map((tmp => { return tmp.json }))).end();
+            })
+            .catch(err => {
+                console.log('prout', err);
+                res.send({ err: err }).end()
+            })
+    }
 })
 
 postgreHelper.initConnection().then(ok => {
@@ -42,20 +42,3 @@ postgreHelper.initConnection().then(ok => {
 }).catch(err => {
     console.log('Error connecting to DB', err);
 });
-
-function checkBody(method, body, cb) {
-    let err = [];
-
-    switch (method) {
-        case "from-file":
-
-            break;
-
-        default:
-            err.push({ methodNotExist: "The method" + method + "isn't supported" })
-            break;
-    }
-
-
-    cb(err)
-}
