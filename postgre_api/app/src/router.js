@@ -15,6 +15,8 @@ app.all("/*", (req, res, next) => {
     next();
 });
 
+app.use("/guests", require("./guests/guests.routes"));
+
 app.post("/from-file", [
     check('fileName').isString().not().isEmpty(),
     check('options').not().isEmpty()
