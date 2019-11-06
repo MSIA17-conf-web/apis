@@ -101,8 +101,9 @@ let emailHelper = {
             from: body.userEmail,
             to: process.env.EMAIL_ADDRESS,
             subject: body.lastName + " " + body.firstName + " cherche à nous contacter",
-            html: "<h3>Message :</h3>"
-                + "<p>" + body.messageEmail + "</p>"
+            html: "<p><b>Nom de l'entreprise : </b>" + body.enterpriseName + "</p>"
+            + "<h4>Message :</h4>"
+            + "<p>" + body.messageEmail + "</p>"
         };
     }
 }
