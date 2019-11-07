@@ -3,11 +3,15 @@ const path = require('path');
 
 module.exports = {
     guests: {
-
+        create: LoadQueryFile('guests/create.sql'),
+        delete: LoadQueryFile('guests/delete.sql'),
+        getAll: LoadQueryFile('guests/getAll.sql'),
+        getOne: LoadQueryFile('guests/getOne.sql'),
+        update: LoadQueryFile('guests/update.sql')
     }, 
     misc: {
-        confFormData: LoadQueryFile('./misc/confFormData.sql'),
-        confDisplayData: LoadQueryFile('./misc/confDisplayData.sql')
+        confFormData: LoadQueryFile('misc/confFormData.sql'),
+        confDisplayData: LoadQueryFile('misc/confDisplayData.sql')
     }
 }
 function LoadQueryFile(file) {
