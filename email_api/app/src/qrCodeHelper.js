@@ -3,28 +3,29 @@ let qr = require('qr-image');
 let qrCodeHelper = {
     createQRCode: body => {
         console.log("Création du QRCode en cours");
+        const templateOptions = body.templateOptions;
 
         // Generate QR Code from text
-        let qrCodePng = qr.imageSync(qrCodeHelper.qrCodeText(body), { type: 'png' })
+        let qrCodePng = qr.imageSync(qrCodeHelper.qrCodeText(templateOptions), { type: 'png' })
 
-        console.log("Création du QRCode terminé pour l'utilisateur", body.lastName, body.firstName);
+        console.log("Création du QRCode terminé pour l'utilisateur", templateOptions.lName, templateOptions.fName);
 
         return { result: qrCodePng.toString('base64') };
     },
     // Get the text to generate QR code
-    qrCodeText: body => {
-        let text = "Nom : " + body.lastName
-            + "\nPrénom : " + body.firstName
-            + "\nEntreprise : " + body.enterpriseName;
+    qrCodeText: templateOptions => {
+        let text = "Nom : " + templateOptions.lName
+            + "\nPrénom : " + templateOptions.fName
+            + "\nEntreprise : " + templateOptions.company;
 
-        if (body.reservationsList.length == 1) {
+        if (templateOptions.conferences.length == 1) {
             text += '\n\nRéservation :';
         } else {
             text += '\n\nRéservations :';
         }
 
-        body.reservationsList.forEach(reservation => {
-            text += '\n- ' + reservation;
+        templateOptions.conferences.forEach(conf => {
+            text += '\n- ' + conf;
         });
 
         return text;

@@ -18,120 +18,41 @@ app.get("/*", (req, res, next) => {
 });
 
 app.post("/sendEmail", (req, res) => {
-  let body = req.body;
-
-  let error = checkBody(body);
-  checkBodyArray(error, body.reservationsList);
-
-  if (!body.userEmail) {
-    error.push({ errEmail: true });
-  }
-
-  if (error.length != 0) {
-    console.log("Error calling sendEmail", error);
-    res.send(error).end();
-  } else {
-    emailHelper.sendEmail(req.body)
+  let error = [];
+  if (error.length == 0) {
+    emailHelper.sendMail(req.body)
       .then(result => res.send(result).end())
-      .catch(err => res.send(err).end());
+      .catch(err => res.send(err).end()
+      );
+  } else {
+    res.send(error).end();
   }
 });
 
 app.post("/sendManyEmail", (req, res) => {
-  if (!Array.isArray(req.body.userList) || !req.body.userList) {
-    res.send({ err: "userList doesn't exist or is not an array" }).end();
-  } else {
-    let errors = []
-    req.body.userList.forEach(body => {
-      let error = checkBody(body);
-      checkBodyArray(error, body.reservationsList);
-      if (!body.userEmail) {
-        error.push({ errEmail: true });
-      }
-      error.length != 0 ? errors.push(error) : null;
-
-    });
-
-    if (errors.length == 0) {
-      emailHelper.sendManyEmail(req.body)
-        .then(result => res.send(result).end())
-        .catch(err => res.send(err).end());
-    } else {
-      res.send(errors).end();
-    }
-  }
-});
-
-
-app.post("/sendContactEmail", (req, res) => {
-  let body = req.body;
-
-  let error = checkBody(body);
-  if (!body.userEmail) {
-    error.push({ errEmail: true });
-  }
-
-  if(!body.messageEmail){
-    error.push({ errMessageEmail: true });
-  }
-
-  if (error.length != 0) {
-    console.log("Error calling sendEmail", error);
-    res.send(error).end();
-  } else {
-    emailHelper.sendContactEmail(req.body)
+  let error = [];
+  if (error.length == 0) {
+    emailHelper.sendManyMail(req.body)
       .then(result => res.send(result).end())
       .catch(err => res.send(err).end());
+  } else {
+    res.send(error).end();
   }
 });
 
 app.put("/createQRCode", (req, res) => {
-  let body = req.body;
-  let error = checkBody(body);
-  checkBodyArray(error, body.reservationsList);
-
+  let error = [];
   if (error.length != 0) {
     console.log("Error calling createQRCode", error);
     res.send(error).end();
   } else {
-    let result = qrCodeHelper.createQRCode(body)
+    let result = qrCodeHelper.createQRCode(req.body)
     res.send(result).end();
   }
 });
 
-app.listen(process.env.SERVER_PORT, () => {
-  console.log("Email API launched on port " + process.env.SERVER_PORT);
-  emailHelper.initTransporter();
+emailHelper.initTransporter(() => {
+  app.listen(process.env.SERVER_PORT, () => {
+    console.log("Email API launched on port " + process.env.SERVER_PORT);
+  });
 });
-
-
-function checkBody(body) {
-  let error = [];
-
-  if (!body.lastName || !body.firstName || !body.enterpriseName) {
-    error.push({ for: body })
-    if (!body.lastName) {
-      error.push({ errLastName: true });
-    }
-
-    if (!body.firstName) {
-      error.push({ errFirstName: true });
-    }
-
-    if (!body.enterpriseName) {
-      error.push({ errEnterpriseName: true });
-    }
-
-    if (!body.reservationsList || body.reservationsList.length == 0) {
-      error.push({ errReservationsListNotEmpty: true });
-    }
-  }
-
-  return error;
-}
-
-function checkBodyArray(error, reservationsList) {
-  if (!reservationsList || reservationsList.length == 0) {
-    error.push({ errReservationsListNotEmpty: true });
-  }
-}

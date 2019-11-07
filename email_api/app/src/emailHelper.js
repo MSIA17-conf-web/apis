@@ -1,12 +1,12 @@
 require("dotenv").config();
-
 const nodemailer = require('nodemailer'),
-    qrCodeHelper = require("./qrCodeHelper");
+    qrCodeHelper = require("./qrCodeHelper"),
+    { templates } = require('./templates');
 
 let transporter = null;
 
 let emailHelper = {
-    initTransporter: () => {
+    initTransporter: (cb) => {
         transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -14,59 +14,54 @@ let emailHelper = {
                 pass: process.env.EMAIL_PASSWORD
             }
         });
+        cb();
     },
-    sendEmail: body => {
+    sendMail: body => {
         return new Promise((resolve, reject) => {
-            let email = body.userEmail;
-
+            let mailOptions;
             console.log("Ecriture du mail");
-            let mailOptions = emailHelper.emailTemplate(body);
-            console.log("Ecriture du mail terminé");
+            switch (body.templateName) {
+                case 'tokenMail':
+                    mailOptions = templates.tokenTemplate.getTemplate(body.data);
+                    break;
+                case 'testMail':
+                    body.data.qrCode = qrCodeHelper.createQRCode(body.data);
 
+                    mailOptions = templates.testTemplate.getTemplate(body.data);
+
+                    break;
+                case 'contactMail':
+                    mailOptions = templates.contactTemplate.getTemplate(body.data);
+                    break;
+                default:
+                    reject({ err: body.templateName + 'template name not supported' });
+                    break;
+            }
+            console.log("Ecriture du mail terminé");
             transporter.sendMail(mailOptions, function (err, info) {
                 if (err) {
-                    console.log("Error sending mail to", email, err);
-                    reject({ err: err });
+                    console.log("Error sending mail to" + mailOptions.to, err);
+                    reject({ err: err, info: info });
                 } else {
-                    console.log('Email sent to ' + email);
-                    resolve({ result: 'Email sent to ' + email });
+                    console.log('Email sent to ' + mailOptions.to);
+                    resolve({ result: 'Email sent to ' + mailOptions.to });
                 }
             });
         });
     },
-    sendContactEmail: body => {
-        return new Promise((resolve, reject) => {
-            let email = body.userEmail;
-
-            console.log("Ecriture du mail");
-            let mailOptions = emailHelper.contactEmailTemplate(body);
-            console.log("Ecriture du mail terminé");
-
-            transporter.sendMail(mailOptions, function (err, info) {
-                if (err) {
-                    console.log("Error sending mail to", email, err);
-                    reject({ err: err });
-                } else {
-                    console.log('Email sent by ' + email);
-                    resolve({ result: true });
-                }
-            });
-        });
-    },
-    sendManyEmail: body => {
+    sendManyMail: body => {
         return new Promise((resolve, reject) => {
             var allEmail = body.userList.map((mailBody) => {
                 return new Promise((resolve, reject) => {
-                    emailHelper.sendEmail(mailBody)
+                    emailHelper.sendMail(mailBody)
                         .then(() => {
-                            resolve({ result: 'Email sent to ' + mailBody.userEmail })
+                            resolve({ result: 'Email sent to ' + mailBody.data.to })
                         })
                         .catch(err => {
                             reject({ err: err })
-                        })
+                        });
                 })
             })
-
             Promise.all(allEmail).then(results => {
                 console.log("Result of many email sent : ", results);
                 resolve(results)
@@ -76,35 +71,6 @@ let emailHelper = {
 
             })
         });
-    },
-    emailTemplate: body => {
-        let qrCode = qrCodeHelper.createQRCode(body);
-
-        return {
-            from: process.env.EMAIL_ADDRESS,
-            to: body.userEmail,
-            subject: "Sending Email using Node.js",
-            html: "<h3>Bonjour " + body.lastName + " " + body.firstName + "</h3>"
-                + "<p>Merci d'avoir réservé sur notre site.</p>"
-                + "<p>Veuillez trouver en pièce jointe un QRCode permettant de vous identifiez le jour J. Gardé le précieusement.</p>"
-                + "<img src='data:image/png;base64," + qrCode.result + "'>",
-
-            attachments: [{   // encoded string as an attachment
-                filename: "QRCode-" + body.lastName + "-" + body.firstName + ".png",
-                content: qrCode.result,
-                encoding: "base64"
-            }]
-        };
-    },
-    contactEmailTemplate: body => {
-        return {
-            from: body.userEmail,
-            to: process.env.EMAIL_ADDRESS,
-            subject: body.lastName + " " + body.firstName + " cherche à nous contacter",
-            html: "<p><b>Nom de l'entreprise : </b>" + body.enterpriseName + "</p>"
-            + "<h4>Message :</h4>"
-            + "<p>" + body.messageEmail + "</p>"
-        };
     }
 }
 
