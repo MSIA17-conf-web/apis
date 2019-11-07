@@ -1,5 +1,4 @@
-const routes = require('express').Router(),
-    pgHelper = require('../postgreHelper');
+const routes = require('express').Router();
 
 routes.get("/create", (req, res) => {
     res.send({ mess: "guests/create not implemented" }).end();
