@@ -4,7 +4,7 @@ const routes = require('express').Router(),
 routes.post("/create", (req, res) => {
     db.guests.create(req.body)
         .then(data => {
-            res.send({ err: data }).end();
+            res.send({ res: data }).end();
         })
         .catch(err => {
             console.log(err);
