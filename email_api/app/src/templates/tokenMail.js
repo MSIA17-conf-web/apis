@@ -3,7 +3,7 @@ module.exports = {
         return {
             from: options.from === "msia" ? process.env.EMAIL_ADDRESS: options.from,
             to: options.to === "msia" ? process.env.EMAIL_ADDRESS: options.to,
-            subject: options.templateOptions.fName + ", finalisez votre inscription au conférences MSIA17 2019 !",
+            subject: options.templateOptions.fName + ", finalisez votre inscription aux conférences MSIA17 2019 !",
             html: "<p>Cliquez sur ce lien pour valider votre inscription : " + options.templateOptions.url + "</p>"
         };
     }
