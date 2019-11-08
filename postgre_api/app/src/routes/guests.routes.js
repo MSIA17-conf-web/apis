@@ -78,7 +78,7 @@ routes.put("/update", (req, res) => {
             if (data == 0) {
                 res.send({ res: "User not found", success: false }).end();
             } if (data == 1) {
-                res.send({ res: "User update", success: true }).end();
+                res.send({ res: "User updated", success: true }).end();
             } else {
                 res.send({ err: data })
             }
