@@ -9,4 +9,20 @@ module.exports = {
                 + "<p>" + options.messageEmail + "</p>"
         };
     }
+    /*
+    {
+        "templateName": "contactMail", 
+        "data": {
+            "from": "msia", 
+            "to": "",   
+            "templateOptions": 
+            {
+                "lName": "",
+                "fName": "", 
+                "company": "",
+                "messageEmail" : ""
+            }
+        }
+    }
+    */
 }

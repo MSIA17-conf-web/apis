@@ -7,4 +7,18 @@ module.exports = {
             html: "<p>Cliquez sur ce lien pour valider votre inscription : " + options.url + "</p>"
         };
     }
+    /*
+    {
+        "templateName": "tokenMail", 
+        "data": {
+            "from": "msia", 
+            "to": "",   
+            "templateOptions": 
+            {
+                "fName": ""
+                "url": ""
+            }
+        }
+    }
+     */
 }

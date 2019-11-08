@@ -26,9 +26,7 @@ let emailHelper = {
                     break;
                 case 'testMail':
                     body.data.qrCode = qrCodeHelper.createQRCode(body.data);
-
                     mailOptions = templates.testTemplate.getTemplate(body.data);
-
                     break;
                 case 'contactMail':
                     mailOptions = templates.contactTemplate.getTemplate(body.data);

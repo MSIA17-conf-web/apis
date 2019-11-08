@@ -15,7 +15,6 @@ services:
       - 9010:9010
     networks:
       - the_network
-      - the_network
 
   # common_api:
   #   container_name: common_api

@@ -16,4 +16,20 @@ module.exports = {
             }]
         };
     }
+    /*
+    {
+        "templateName": "testMail", 
+        "data": {
+            "from": "msia", 
+            "to": "",   
+            "templateOptions": 
+            {
+                "lName": ""
+                "fName": "", 
+                "company": "",
+                "conferences" : []
+            }
+        }
+    }
+    */
 }
