@@ -25,7 +25,9 @@ let qrCodeHelper = {
         }
 
         templateOptions.conferences.forEach(conf => {
-            text += '\n- ' + conf;
+            if(conf){
+                text += '\n- ' + conf;
+            }
         });
 
         return text;
