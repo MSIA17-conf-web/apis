@@ -11,7 +11,8 @@ module.exports = {
     }, 
     misc: {
         confFormData: LoadQueryFile('misc/confFormData.sql'),
-        confDisplayData: LoadQueryFile('misc/confDisplayData.sql')
+        confDisplayData: LoadQueryFile('misc/confDisplayData.sql'),
+        getThematicData: LoadQueryFile('misc/getThematicData.sql')
     }
 }
 function LoadQueryFile(file) {

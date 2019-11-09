@@ -12,6 +12,10 @@ class MiscRepository {
     async getConfDisplayData() {
         return this.db.any(sql.confDisplayData);
     }
+
+    async getThematicData(data) {
+        return this.db.oneOrNone(sql.getThematicData, data);
+    }
 }
 
 module.exports = MiscRepository;

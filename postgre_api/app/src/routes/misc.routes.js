@@ -42,7 +42,7 @@ routes.post("/verify-token", (req, res) => {
                         data.hasValidate = true;
                         db.guests.update(data)
                             .then(updated_data => {
-                                
+
                                 if (updated_data == 0) {
                                     res.send({ res: "User not found", success: false, type: "userNotFoundAfterTokenValidation" }).end();
                                 } if (updated_data == 1) {
@@ -69,4 +69,18 @@ routes.post("/verify-token", (req, res) => {
             }).end();
         })
 })
+
+routes.post("/get-thematic-data", (req, res) => {
+    db.misc.getThematicData(req.body).then(data => {
+        console.log("get-thematic-data", data);
+        res.send(data.json).end();
+    })
+        .catch(err => {
+            console.log(err);
+            res.send({
+                err: err.message || err
+            })
+        })
+})
+
 module.exports = routes;
