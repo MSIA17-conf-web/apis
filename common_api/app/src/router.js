@@ -7,15 +7,13 @@ const axios = require("axios"),
   https = require('https'),
   fs = require('fs'),
   app = express(),
-  // http = require("http"),
-  // https = require("https"),
   bodyParser = require("body-parser");
-  
+
 const options = {
-    key: fs.readFileSync("/etc/letsencrypt/live/www.msia17conferences.com/privkey.pem"),
-    cert: fs.readFileSync("/etc/letsencrypt/live/www.msia17conferences.com/fullchain.pem"),
-    ca: fs.readFileSync("/etc/letsencrypt/live/www.msia17conferences.com/chain.pem")
-  };
+  key: fs.readFileSync("/etc/letsencrypt/live/www.msia17conferences.com/privkey.pem"),
+  cert: fs.readFileSync("/etc/letsencrypt/live/www.msia17conferences.com/fullchain.pem"),
+  ca: fs.readFileSync("/etc/letsencrypt/live/www.msia17conferences.com/chain.pem")
+};
 
 const httpsServer = https.createServer(options, app)
 
@@ -24,11 +22,9 @@ app.use(cors());
 
 app.all("/api", (req, res) => {
   try {
-    console.log("Request", req.headers);
-    console.log("");
-
     checkBody("api", req.body)
       .then(checkedBody => {
+        console.log("checkedBody", checkedBody);
 
         axios
           .request({
@@ -38,20 +34,32 @@ app.all("/api", (req, res) => {
             data: checkedBody.body
           })
           .then(response => {
-            console.log("response from ", checkedBody.baseURL);
-            console.log(response.data);
-
+            console.log("response from", checkedBody.baseURL);
             res.send(response.data).end();
           })
-          .catch(err => {
-            console.log("Error during api request ", err);
-
-            res.send(err).end();
+          .catch(function (error) {
+            if (error.response) {
+              console.log("RESPONSE ERROR");
+              // console.log(error.response.data);
+              console.log(error.response.status);
+              console.log(error.response.statusText)
+              res.send({
+                status: error.response.status,
+                statusText: error.response.statusText,
+                data: error.response.data,
+                success: false
+              }).end();
+            } else if (error.request) {
+              console.log("REQUEST ERROR");
+              res.send({ err: "request error", success: false, msg: "The host surely doesn't exist" }).end();
+            } else {
+              console.log('Error', error.message);
+              res.send({ err: "Error setting up the request", success: false, msg: error.message }).end();
+            }
           });
       })
       .catch(err => {
         console.log("err", err);
-        
         res.send(err).end();
       });
   } catch (err) {
@@ -68,8 +76,6 @@ function checkBody(method, body) {
   return new Promise((resolve, reject) => {
     switch (method) {
       case "api":
-        console.log("body", body);
-        console.log("body.method", body.method);
         // Check existence 
         var missing_opt = []
 
