@@ -341,6 +341,9 @@ function connect(params) {
 
     con.on("connect", () => {
       log.info("Connected to MQTT");
+      setInterval(() => {
+        con.publish("/angular", JSON.stringify({message: "Did you get that Angular ? "}));
+      },1000)
       resolve();
     });
     con.on("error", err => {

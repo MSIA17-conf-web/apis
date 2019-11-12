@@ -16,6 +16,7 @@
     "express": "^4.16.4",
     "log4js": "^4.0.2",
     "log4js-extend": "^0.2.1",
-    "mqtt": "^2.18.8"
+    "mqtt": "^2.18.8",
+    "express-validator": "^6.2.0"
   }
 }

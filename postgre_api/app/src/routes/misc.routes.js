@@ -1,5 +1,6 @@
 const routes = require('express').Router(),
-    { db } = require('../db');
+    { db } = require('../db'),
+    { check, validationResult } = require('express-validator');
 
 routes.get("/conf-form-data", (req, res) => {
     db.misc.getConfFormData()
@@ -29,7 +30,15 @@ routes.get("/conf-display-data", (req, res) => {
         })
 })
 
-routes.post("/verify-token", (req, res) => {
+routes.post("/verify-token", [
+    checkBody('email', 'email'),
+    checkBody('token', 'notEmpty')
+    // length min pour token ?
+], (req, res) => {
+    let error = checkError(req, res);
+    if (error) {
+        return error;
+    }
     db.guests.getOne({
         email: req.body.email
     })
@@ -42,7 +51,6 @@ routes.post("/verify-token", (req, res) => {
                         data.hasValidate = true;
                         db.guests.update(data)
                             .then(updated_data => {
-
                                 if (updated_data == 0) {
                                     res.send({ res: "User not found", success: false, type: "userNotFoundAfterTokenValidation" }).end();
                                 } if (updated_data == 1) {
@@ -70,7 +78,15 @@ routes.post("/verify-token", (req, res) => {
         })
 })
 
-routes.post("/get-thematic-data", (req, res) => {
+routes.post("/get-thematic-data", [
+    checkBody('confId', 'notEmpty'),
+    checkBody('confId', 'integer')
+    // check integer or numeric ?
+], (req, res) => {
+    let error = checkError(req, res);
+    if (error) {
+        return error;
+    }
     db.misc.getThematicData(req.body).then(data => {
         console.log("get-thematic-data", data);
         res.send(data.json).end();
@@ -84,3 +100,30 @@ routes.post("/get-thematic-data", (req, res) => {
 })
 
 module.exports = routes;
+
+function checkBody(attribut, method, value) {
+    switch (method) {
+        case 'notEmpty':
+            return check(attribut).not().isEmpty().withMessage('Ce champ est obligatoire');
+
+        case 'length':
+            return check(attribut).isLength({ min: 2 }).withMessage('Ce champ doit contenir au minimu ' + value + ' caractères');
+
+        case 'email':
+            return check(attribut).not().isEmpty().withMessage('Ce champ est obligatoire').isEmail();
+
+        case 'integer':
+            return check(attribut).isNumeric().withMessage('Ce champ doit être un chiffre');
+
+        default:
+            break;
+    }
+}
+
+function checkError(req, res) {
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+}

@@ -1,25 +1,31 @@
-require("dotenv").config();
+require('dotenv').config();
 
-const cors = require("cors"),
-  express = require("express"),
+const cors = require('cors'),
+  express = require('express'),
   app = express(),
-  http = require("http"),
-  // https = require("https"),
-  bodyParser = require("body-parser"),
-  minioHelper = require("./minioHelper");
+  http = require('http'),
+  // https = require('https'),
+  bodyParser = require('body-parser'),
+  minioHelper = require('./minioHelper'),
+  { check, validationResult } = require('express-validator');
 
 
 app.use(bodyParser.json());
 app.use(cors());
 
-app.get("/*", (req, res, next) => {
-  console.log("Request", req.path);
+app.get('/*', (req, res, next) => {
+  console.log('Request', req.path);
   next();
 });
 
-app.put("/createBucket", (req, res) => {
-  console.log("Start of create bucket");
-
+app.put('/createBucket', [
+  checkBody('bucketName', 'notEmpty')
+], (req, res) => {
+  let error = checkError(req, res);
+  if (error) {
+    return error;
+  }
+  console.log('Start of create bucket');
   minioHelper.createBucket(req.body.bucketName)
     .then(result => {
       res.send(result).end()
@@ -30,30 +36,42 @@ app.put("/createBucket", (req, res) => {
 
 });
 
-app.put("/createFile", (req, res) => {
-  console.log("Start of create file");
-
+app.put('/createFile', [
+  checkBody('bucketName', 'notEmpty'),
+  checkBody('fileName', 'notEmpty'),
+  checkBody('fileName', 'notEmpty')
+], (req, res) => {
+  let error = checkError(req, res);
+  if (error) {
+    return error;
+  }
+  console.log('Start of create file');
   minioHelper.createFile(req.body)
     .then(result => res.send(result).end())
     .catch(err => res.send(err).end());
 
 });
 
-app.get("/listConfBuckets", (req, res) => {
-  console.log("Got request on " + req.path);
+app.get('/listConfBuckets', (req, res) => {
   minioHelper.getListConfBuckets()
     .then(result => {
-      console.log("get went well", result);
+      console.log('get went well', result);
       res.send(result).end();
     })
     .catch(err => {
-      console.log("get went bad", err);
+      console.log('get went bad', err);
       res.send(err).end();
     });
 });
 
-app.post("/listConfFiles", (req, res) => {
-  console.log("Got request on{ fileName: fileName } " + req.path);
+app.post('/listConfFiles', [
+  checkBody('bucketName', 'notEmpty')
+], (req, res) => {
+  let error = checkError(req, res);
+  if (error) {
+    return error;
+  }
+  console.log('Got request on{ fileName: fileName } ' + req.path);
   minioHelper.getListConfFiles(req.body.bucketName)
     .then(result => {
       res.send(result).end();
@@ -63,41 +81,80 @@ app.post("/listConfFiles", (req, res) => {
     });
 });
 
-app.post("/getFile", (req, res) => {
+app.post('/getFile', [
+  checkBody('bucketName', 'notEmpty'),
+  checkBody('fileName', 'notEmpty')
+], (req, res) => {
+  let error = checkError(req, res);
+  if (error) {
+    return error;
+  }
   minioHelper.getFile(req.body)
     .then(result => res.send(result).end())
     .catch(err => res.send(err).end());
 })
 
-app.delete("/removeBucket", (req, res) => {
+app.delete('/removeBucket', [
+  checkBody('bucketName', 'notEmpty')
+], (req, res) => {
+  let error = checkError(req, res);
+  if (error) {
+    return error;
+  }
   minioHelper.removeBucket(req.body.bucketName)
     .then(result => res.send(result).end())
     .catch(err => res.send(err).end());
 
 });
 
-app.delete("/removeFile", (req, res) => {
+app.delete('/removeFile', [
+  checkBody('bucketName', 'notEmpty'),
+  checkBody('fileName', 'notEmpty')
+], (req, res) => {
+  let error = checkError(req, res);
+  if (error) {
+    return error;
+  }
   minioHelper.removeFile(req.body)
     .then(result => res.send(result).end())
     .catch(err => res.send(err).end());
 
 });
 
-app.delete("/removeAllFiles", (req, res) => {
+app.delete('/removeAllFiles', [
+  checkBody('bucketName', 'notEmpty')
+], (req, res) => {
+  let error = checkError(req, res);
+  if (error) {
+    return error;
+  }
   minioHelper.removeAllFiles(req.body.bucketName)
     .then(result => {
-      console.log("okok");
       res.send(result).end()
     })
     .catch(err => {
-      console.log(
-        "enculé"
-      );
       res.send(err).end()
     });
-
 });
 
 app.listen(process.env.SERVER_PORT, () => {
-  console.log("Minio API launched on port " + process.env.SERVER_PORT);
+  console.log('Minio API launched on port ' + process.env.SERVER_PORT);
 });
+
+function checkBody(attribut, method) {
+  switch (method) {
+    case 'notEmpty':
+      return check(attribut).not().isEmpty().withMessage('Ce champ est obligatoire');
+
+    default:
+      break;
+  }
+}
+
+function checkError(req, res) {
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+}
