@@ -9,7 +9,10 @@ module.exports = {
             html: "<h3>Bonjour " + options.templateOptions.lName + " " + options.templateOptions.fName + "</h3>"
                 + "<p>Merci d'avoir réservé sur notre site.</p>"
                 + "<p>Veuillez trouver en pièce jointe un QRCode permettant de vous identifiez le jour des conférences. Gardé le précieusement.</p>"
-                + "<img src='data:image/png;base64," + options.qrCode.result + "'>",
+                // Je cois l'image ne marche pas
+                + "<img src='data:image/png;base64," + options.qrCode.result + "'>"
+                + "<a href='https://msia17conferences.com/dev/inscription-willem?" + options.userdata + "&delete=true' target='_blank'>Se Désinscrire</a> | "
+                + "<a href='https://msia17conferences.com/dev/inscription-willem?" + options.userdata + "&update=true' target='_blank'>Modifier mes informations</a>",
 
             attachments: [{   // encoded string as an attachment
                 filename: "QRCode-" + options.templateOptions.lName + "-" + options.templateOptions.fName + ".png",
