@@ -13,8 +13,8 @@ class MiscRepository {
         return this.db.any(sql.confDisplayData);
     }
 
-    async getThematicData(data) {
-        return this.db.oneOrNone(sql.getThematicData, data);
+    async getConfName(data) {
+        return this.db.oneOrNone(sql.getConfName, data);
     }
 }
 

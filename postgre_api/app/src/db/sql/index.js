@@ -12,7 +12,7 @@ module.exports = {
     misc: {
         confFormData: LoadQueryFile('misc/confFormData.sql'),
         confDisplayData: LoadQueryFile('misc/confDisplayData.sql'),
-        getThematicData: LoadQueryFile('misc/getThematicData.sql')
+        getConfName: LoadQueryFile('misc/getConfName.sql')
     }
 }
 function LoadQueryFile(file) {

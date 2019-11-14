@@ -53,13 +53,14 @@ routes.post("/verify-token", [
                             .then(updated_data => {
                                 if (updated_data == 0) {
                                     res.send({ res: "User not found", success: false, type: "userNotFoundAfterTokenValidation" }).end();
-                                } if (updated_data == 1) {
+                                } else if (updated_data == 1) {
                                     res.send({ res: "User successfully registered", success: true }).end();
                                 } else {
-                                    res.send({ err: updated_data, type: "updateError", success: false })
+                                    res.send({ err: updated_data, type: "updateError", success: false }).end();
                                 }
                             })
                             .catch(err => {
+                                res.send({ err: err, type: "updateError", success: false }).end();
                             })
                     } else {
                         res.send({ err: req.body.token + " doesn't match found token", type: "tokenNotMatch", success: false }).end();
@@ -78,7 +79,7 @@ routes.post("/verify-token", [
         })
 })
 
-routes.post("/get-thematic-data", [
+routes.post("/get-conf-name", [
     checkBody('confId', 'notEmpty'),
     checkBody('confId', 'integer')
     // check integer or numeric ?
@@ -87,8 +88,8 @@ routes.post("/get-thematic-data", [
     if (error) {
         return error;
     }
-    db.misc.getThematicData(req.body).then(data => {
-        console.log("get-thematic-data", data);
+    db.misc.getConfName(req.body).then(data => {
+        console.log("get-conf-name", data);
         res.send(data.json).end();
     })
         .catch(err => {

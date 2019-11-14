@@ -1,0 +1,1 @@
+SELECT  json_build_object('confName', cf."confName") FROM conferences."conferencesList" cf where cf."confId" = ${confId}
