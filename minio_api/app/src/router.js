@@ -23,7 +23,7 @@ app.put('/createBucket', [
 ], (req, res) => {
   let error = checkError(req, res);
   if (error) {
-    return error;
+    return res.send(error).end();
   }
   console.log('Start of create bucket');
   minioHelper.createBucket(req.body.bucketName)
@@ -43,7 +43,7 @@ app.put('/createFile', [
 ], (req, res) => {
   let error = checkError(req, res);
   if (error) {
-    return error;
+    return res.send(error).end();
   }
   console.log('Start of create file');
   minioHelper.createFile(req.body)
@@ -69,7 +69,7 @@ app.post('/listConfFiles', [
 ], (req, res) => {
   let error = checkError(req, res);
   if (error) {
-    return error;
+    return res.send(error).end();
   }
   console.log('Got request on{ fileName: fileName } ' + req.path);
   minioHelper.getListConfFiles(req.body.bucketName)
@@ -87,7 +87,7 @@ app.post('/getFile', [
 ], (req, res) => {
   let error = checkError(req, res);
   if (error) {
-    return error;
+    return res.send(error).end();
   }
   minioHelper.getFile(req.body)
     .then(result => res.send(result).end())
@@ -99,7 +99,7 @@ app.delete('/removeBucket', [
 ], (req, res) => {
   let error = checkError(req, res);
   if (error) {
-    return error;
+    return res.send(error).end();
   }
   minioHelper.removeBucket(req.body.bucketName)
     .then(result => res.send(result).end())
@@ -113,7 +113,7 @@ app.delete('/removeFile', [
 ], (req, res) => {
   let error = checkError(req, res);
   if (error) {
-    return error;
+    return res.send(error).end();
   }
   minioHelper.removeFile(req.body)
     .then(result => res.send(result).end())
@@ -126,7 +126,7 @@ app.delete('/removeAllFiles', [
 ], (req, res) => {
   let error = checkError(req, res);
   if (error) {
-    return error;
+    return res.send(error).end();
   }
   minioHelper.removeAllFiles(req.body.bucketName)
     .then(result => {
