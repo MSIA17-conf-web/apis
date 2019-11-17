@@ -32,6 +32,10 @@ let emailHelper = {
                     body.data.qrCode = qrCodeHelper.createQRCode(body.data);
                     mailOptions = templates.successfullSignUpTemplate.getTemplate(body.data);
                     break;
+                case 'successfullUpdateSignUpMail':
+                    body.data.qrCode = qrCodeHelper.createQRCode(body.data);
+                    mailOptions = templates.successfullUpdateSignUpTemplate.getTemplate(body.data);
+                    break;
                 case 'contactMail':
                     mailOptions = templates.contactTemplate.getTemplate(body.data);
                     break;

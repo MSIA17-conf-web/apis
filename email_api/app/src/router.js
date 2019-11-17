@@ -33,7 +33,7 @@ app.post("/sendEmail", [
 ], (req, res) => {
   let error = checkError(req, res);
   if (error) {
-    return res.send(error).end();
+    return res.status(422).json(error);
   }
 
   emailHelper.sendMail(req.body)

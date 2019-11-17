@@ -102,6 +102,19 @@ services:
       - the_network
     stdin_open: true
 
+  postgre_api_prod:
+    container_name: postgre_api_prod
+    hostname: postgre_api_prod
+    restart: always
+    build: 
+      context: ./postgre_api
+      dockerfile: Dockerfile
+    ports:
+      - 9010
+    networks:
+      - the_network
+    
+
 volumes: 
   cert-handler_certbot-letsencrypt:
     external: true

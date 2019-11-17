@@ -20,7 +20,7 @@ routes.post('/create', [
     
     let error = checkError(req, res);
     if(error) {
-        return res.send(error).end();
+        return res.status(422).json(error);
     }
     db.guests.create(req.body)
         .then(data => {
@@ -41,7 +41,7 @@ routes.delete('/delete', [
 ], (req, res) => {
     let error = checkError(req, res);
     if(error) { 
-        return res.send(error).end();
+        return res.status(422).json(error);
     }
     db.guests.delete(req.body)
         .then(data => {
@@ -85,7 +85,7 @@ routes.post('/get-one', [
 ], (req, res) => {
     let error = checkError(req, res);
     if(error) { 
-        return res.send(error).end();
+        return res.status(422).json(error);
     }
 
     db.guests.getOne(req.body)
@@ -112,7 +112,7 @@ routes.post("/verify-token", [
 ], (req, res) => {
     let error = checkError(req, res);
     if (error) {
-        return res.send(error).end();
+        return res.status(422).json(error);
     }
     db.guests.getOne({
         email: req.body.email
@@ -154,7 +154,7 @@ routes.put('/update', [
 ], (req, res) => {
     let error = checkError(req, res);
     if (error) {
-        return res.send(error).end();
+        return res.status(422).json(error);
     }
 
     db.guests.getOne({
@@ -227,7 +227,7 @@ function checkError(req, res){
     const errors = validationResult(req)
     
     if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+        return { errors: errors.array() }
     }
 }
 function updateUser(req, res, data) {

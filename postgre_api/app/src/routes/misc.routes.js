@@ -37,7 +37,7 @@ routes.post("/get-conf-name", [
 ], (req, res) => {
     let error = checkError(req, res);
     if (error) {
-        return res.send(error).end();
+        return res.status(422).json(error);
     }
     db.misc.getConfName(req.body).then(data => {
         console.log("get-conf-name", data);
@@ -76,6 +76,6 @@ function checkError(req, res) {
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+        return { errors: errors.array() };
     }
 }
