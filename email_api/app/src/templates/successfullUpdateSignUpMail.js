@@ -7,7 +7,7 @@ module.exports = {
             to: options.to === "msia" ? process.env.EMAIL_ADDRESS: options.to,
             subject: "Confirmation de mise à jour",
             html: "<h3>Bonjour " + options.templateOptions.lName + " " + options.templateOptions.fName + "</h3>"
-                + "<p>Vos données ont correctement été mise à jour..</p>"
+                + "<p>Vos données ont correctement été mise à jour.</p>"
                 + "<p>Veuillez trouver en pièce jointe un nouveau QRCode permettant de vous identifiez le jour des conférences. Gardé le précieusement.</p>"
                 // Je cois l'image ne marche pas
                 + "<img src='data:image/png;base64," + options.qrCode.result + "'>"

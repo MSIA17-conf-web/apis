@@ -31,6 +31,8 @@ app.post("/sendEmail", [
   // checkBody('data.templateOptions.company', 'length', 2),
   // checkBody('data.templateOptions.conferences', 'arrayNotEmpty')
 ], (req, res) => {
+  console.log('yolo')
+  
   let error = checkError(req, res);
   if (error) {
     return res.status(422).json(error);

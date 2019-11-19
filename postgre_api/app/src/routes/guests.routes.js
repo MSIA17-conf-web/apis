@@ -91,9 +91,9 @@ routes.post('/get-one', [
     db.guests.getOne(req.body)
         .then(data => {
             if (data) {
-                res.send(data).end();
+                res.send({ data, success: true }).end();
             } else {
-                res.send({ err: 'User with email : ' + req.body.email + ' not found' });
+                res.send({ err: 'User with email : ' + req.body.email + ' not found', success: false });
             }
         })
         .catch(err => {
@@ -156,6 +156,7 @@ routes.put('/update', [
     if (error) {
         return res.status(422).json(error);
     }
+    console.log("caca")
 
     db.guests.getOne({
         email: req.body.email
