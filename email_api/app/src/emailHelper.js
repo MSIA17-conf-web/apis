@@ -16,7 +16,7 @@ let emailHelper = {
         });
         cb();
     },
-    sendMail: body => {
+    sendMail: (body, path) => {
         return new Promise((resolve, reject) => {
             let mailOptions;
             console.log("Ecriture du mail");
@@ -30,11 +30,11 @@ let emailHelper = {
                     break;
                 case 'successfullSignUpMail':
                     body.data.qrCode = qrCodeHelper.createQRCode(body.data);
-                    mailOptions = templates.successfullSignUpTemplate.getTemplate(body.data);
+                    mailOptions = templates.successfullSignUpTemplate.getTemplate(body.data, path);
                     break;
                 case 'successfullUpdateSignUpMail':
                     body.data.qrCode = qrCodeHelper.createQRCode(body.data);
-                    mailOptions = templates.successfullUpdateSignUpTemplate.getTemplate(body.data);
+                    mailOptions = templates.successfullUpdateSignUpTemplate.getTemplate(body.data, path);
                     break;
                 case 'contactMail':
                     mailOptions = templates.contactTemplate.getTemplate(body.data);

@@ -37,8 +37,9 @@ app.post("/sendEmail", [
   if (error) {
     return res.status(422).json(error);
   }
+console.log("req.path", req.path);
 
-  emailHelper.sendMail(req.body)
+  emailHelper.sendMail(req.body, req.path)
     .then(result => res.send(result).end())
     .catch(err => res.send(err).end()
     );
