@@ -40,17 +40,17 @@ let emailHelper = {
                     mailOptions = templates.contactTemplate.getTemplate(body.data);
                     break;
                 default:
-                    reject({ err: body.templateName + 'template name not supported' });
+                    reject({ err: body.templateName + 'template name not supported', success: false });
                     break;
             }
             console.log("Ecriture du mail terminé");
             transporter.sendMail(mailOptions, function (err, info) {
                 if (err) {
                     console.log("Error sending mail to" + mailOptions.to, err);
-                    reject({ err: err, info: info });
+                    reject({ err: err, info: info, success: false });
                 } else {
                     console.log('Email sent to ' + mailOptions.to);
-                    resolve({ result: 'Email sent to ' + mailOptions.to });
+                    resolve({ result: 'Email sent to ' + mailOptions.to, success: true });
                 }
             });
         });
