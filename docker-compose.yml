@@ -59,6 +59,18 @@ services:
     networks:
       - the_network
     stdin_open: true
+
+  email_api_prod:
+    container_name: email_api_prod
+    hostname: email_api_prod
+    restart: always
+    build: 
+      context: ./email_api
+      dockerfile: Dockerfile
+    ports: 
+      - 9010
+    networks:
+      - the_network
     
   mongo_api:
     container_name: mongo_api

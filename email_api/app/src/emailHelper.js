@@ -16,10 +16,16 @@ let emailHelper = {
         });
         cb();
     },
-    sendMail: (body, path) => {
+    sendMail: (body) => {
         return new Promise((resolve, reject) => {
             let mailOptions;
-            console.log("Ecriture du mail");
+            console.log("Ecriture du mail en cours");
+            let path = "";
+
+            if(process.env.production === 'false') {
+                path = "/dev"
+            }
+
             switch (body.templateName) {
                 case 'tokenMail':
                     mailOptions = templates.tokenTemplate.getTemplate(body.data);
@@ -29,10 +35,14 @@ let emailHelper = {
                     mailOptions = templates.testTemplate.getTemplate(body.data);
                     break;
                 case 'successfullSignUpMail':
+                    console.log("successfullSignUpMail", path);
+                    
                     body.data.qrCode = qrCodeHelper.createQRCode(body.data);
                     mailOptions = templates.successfullSignUpTemplate.getTemplate(body.data, path);
                     break;
                 case 'successfullUpdateSignUpMail':
+                        console.log("successfullUpdateSignUpMail", path);
+
                     body.data.qrCode = qrCodeHelper.createQRCode(body.data);
                     mailOptions = templates.successfullUpdateSignUpTemplate.getTemplate(body.data, path);
                     break;

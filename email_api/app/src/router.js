@@ -1,4 +1,6 @@
-require("dotenv").config();
+var env = require("dotenv").config();
+
+console.log(env.parsed);
 
 const cors = require("cors"),
   express = require("express"),
@@ -37,9 +39,8 @@ app.post("/sendEmail", [
   if (error) {
     return res.status(422).json(error);
   }
-console.log("req.path", req.path);
 
-  emailHelper.sendMail(req.body, req.path)
+  emailHelper.sendMail(req.body)
     .then(result => res.send(result).end())
     .catch(err => res.send(err).end()
     );
@@ -82,7 +83,7 @@ function checkBody(attribut, method, value) {
       return check(attribut).isJSON().withMessage('Doit-être au format JSON');
 
       case 'length':
-        return check(attribut).isLength({ min: 2 }).withMessage('Ce champ doit contenir au minimu ' + value + ' caractères');
+        return check(attribut).isLength({ min: 2 }).withMessage('Ce champ doit contenir au minimum ' + value + ' caractères');
 
     case 'email':
       return check(attribut).not().isEmpty().withMessage('Ce champ est obligatoire').isEmail();

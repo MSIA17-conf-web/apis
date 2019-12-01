@@ -4,7 +4,7 @@ module.exports = {
             from: options.from === "msia" ? process.env.EMAIL_ADDRESS: options.from,
             to: options.to === "msia" ? process.env.EMAIL_ADDRESS: options.to,
             subject: options.templateOptions.fName + ", finalisez votre inscription aux conférences MSIA17 2019 !",
-            html: "<p>Cliquez sur ce lien pour valider votre inscription : " + options.templateOptions.url + "</p>"
+            html: "<p>Cliquez sur le lien suivant pour valider votre inscription : " + options.templateOptions.url + "</p>"
         };
     }
     /*
