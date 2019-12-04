@@ -17,9 +17,9 @@ routes.post('/create', [
     checkBody('token', 'notEmpty'),
     checkBody('conferences', 'arrayNotEmpty')
 ], (req, res) => {
-    
+
     let error = checkError(req, res);
-    if(error) {
+    if (error) {
         return res.status(422).json(error);
     }
     db.guests.create(req.body)
@@ -40,7 +40,7 @@ routes.delete('/delete', [
     checkBody('email', 'email')
 ], (req, res) => {
     let error = checkError(req, res);
-    if(error) { 
+    if (error) {
         return res.status(422).json(error);
     }
     db.guests.delete(req.body)
@@ -84,7 +84,7 @@ routes.post('/get-one', [
     checkBody('email', 'email')
 ], (req, res) => {
     let error = checkError(req, res);
-    if(error) { 
+    if (error) {
         return res.status(422).json(error);
     }
 
@@ -120,7 +120,7 @@ routes.post("/verify-token", [
         .then(data => {
             if (data) {
                 if (data.hasValidate) {
-                    res.send({ err: req.body.email + " has already registered", success: false, type: "alreadyRegistered" })
+                    res.send({ err: req.body.email + " has already registered", success: false, type: "alreadyRegistered", hasValidate: data.hasValidate })
                 } else {
                     updateUser(req, res, data);
                 }
@@ -156,7 +156,6 @@ routes.put('/update', [
     if (error) {
         return res.status(422).json(error);
     }
-    console.log("caca")
 
     db.guests.getOne({
         email: req.body.email
@@ -175,9 +174,9 @@ routes.put('/update', [
                 err: err.message || err
             }).end();
         })
-    
-    
-    
+
+
+
     // db.guests.update(req.body)
     //     .then(data => {
     //         if (data == 0) {
@@ -224,14 +223,16 @@ function checkBody(attribut, method, value) {
     }
 }
 
-function checkError(req, res){
+function checkError(req, res) {
     const errors = validationResult(req)
-    
+
     if (!errors.isEmpty()) {
         return { errors: errors.array() }
     }
 }
 function updateUser(req, res, data) {
+    console.log('Token to be compared : ' + data.token + " and " + req.body.token);
+
     if (data.token === req.body.token) {
         data.hasValidate = true;
         db.guests.update(data)
