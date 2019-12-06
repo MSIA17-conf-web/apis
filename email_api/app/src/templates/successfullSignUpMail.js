@@ -10,7 +10,7 @@ module.exports = {
             to: options.to === "msia" ? process.env.EMAIL_ADDRESS: options.to,
             subject: "Confirmation de votre inscrition",
             html: header
-                + "<h3>Bonjour " + options.templateOptions.lName + " " + options.templateOptions.fName + "</h3>"
+                + "<h3>Bonjour " + options.templateOptions.fName + " " + options.templateOptions.lName + "</h3>"
                 + "<p>Merci d'avoir réservé sur notre site.</p>"
                 + "<p>Veuillez trouver en pièce jointe un QRCode permettant de vous identifiez le jour des conférences. Gardez le précieusement.</p>"
                 + "<a href='https://msia17conferences.com"+ path +"/inscription?userdata=" + options.userdata + "&delete=true' target='_blank'>Se désinscrire</a> | "
