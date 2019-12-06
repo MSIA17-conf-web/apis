@@ -8,7 +8,7 @@ module.exports = {
             to: options.to === "msia" ? process.env.EMAIL_ADDRESS : options.to,
             subject: options.templateOptions.fName + ", finalisez votre inscription aux conférences MSIA17 2020 !",
             html: header
-                + "<a href=\"" + options.templateOptions.url + "\">Cliquez ici pour valider votre inscription</a></br>"
+                + "<a href=\"" + options.templateOptions.url + "\">Cliquez ici</a> pour valider votre inscription</br>"
                 + "<p style=\"font-size=\"8px\" \"><a href=\"" + options.templateOptions.url + "\">"+ options.templateOptions.url +"</a></p>"
                 + footer
         };

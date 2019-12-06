@@ -3,8 +3,6 @@ const footer = require('./html').footer
 
 module.exports = {
     getTemplate(options, path) {
-        console.log("<img src='data:image/png;base64," + options.qrCode.result + "'>");
-        
         return {
             from: options.from === "msia" ? process.env.EMAIL_ADDRESS: options.from,
             to: options.to === "msia" ? process.env.EMAIL_ADDRESS: options.to,
