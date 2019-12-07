@@ -162,7 +162,7 @@ routes.put('/update', [
     })
         .then(data => {
             if (data) {
-                updateUser(req, res, data);
+                updateUser(req, res, req.body);
             } else {
                 res.send({ err: req.body.email + " not found", type: "emailNotFound", success: false }).end();
             }
@@ -232,7 +232,6 @@ function checkError(req, res) {
 }
 function updateUser(req, res, data) {
     console.log('Token to be compared : ' + data.token + " and " + req.body.token);
-
     if (data.token === req.body.token) {
         data.hasValidate = true;
         db.guests.update(data)
